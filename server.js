@@ -4,10 +4,17 @@ var express = require('express'),
 
 var app = express();
 
+app.use(function(req,res,next) {
+    console.log(req.method + " " + req.url);
+    console.log(req.headers)
+    next()
+})
 app.use(bodyParser.json());
 
+var memorymodel = require('./models/memory')
+
 app.oauth = oauthserver({
-  model: {}, // See below for specification
+  model: memorymodel,
   grants: ['password'],
   debug: true
 });

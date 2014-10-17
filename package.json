@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build" : "./node_modules/browserify/bin/cmd.js ./client/web/js/index.js -o ./client/web/js/bundle.js"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +13,8 @@
     "cors": "^2.4.2",
     "express": "^4.9.7",
     "body-parser": "^1.9.0",
-    "oauth2-server": "^2.3.0"
+    "oauth2-server": "^2.3.0",
+    "ecstatic": "^0.5.5",
+    "browserify": "^6.1.0"
   }
 }
