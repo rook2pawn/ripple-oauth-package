@@ -1,31 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function (Buffer){
-var atob = function (str) {
-    return new Buffer(str, 'base64').toString('binary');
-}
-var btoa = function(str) {
-    var buffer;
-    if (str instanceof Buffer) {
-      buffer = str;
-    } else {
-      buffer = new Buffer(str.toString(), 'binary');
-    }
-    return buffer.toString('base64');
-}
-var qs = require('querystring')
-
-$(window).ready(function() {
-    console.log("Ready!")
-    $('input#modify').click(function() {
-        console.log("CLICK!")
-        var href = $('a#authlink').attr('href')
-        href = href.replace('CLIENT_ID',$('input#client_id').val())
-        console.log(href)
-    })
-})
-
-}).call(this,require("buffer").Buffer)
-},{"buffer":2,"querystring":8}],2:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -1077,7 +1050,7 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":3,"ieee754":4,"is-array":5}],3:[function(require,module,exports){
+},{"base64-js":2,"ieee754":3,"is-array":4}],2:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -1199,7 +1172,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -1285,7 +1258,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 
 /**
  * isArray
@@ -1320,7 +1293,7 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1406,7 +1379,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1493,10 +1466,89 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":6,"./encode":7}]},{},[1]);
+},{"./decode":5,"./encode":6}],8:[function(require,module,exports){
+(function (Buffer){
+var atob = function (str) {
+    return new Buffer(str, 'base64').toString('binary');
+}
+var btoa = function(str) {
+    var buffer;
+    if (str instanceof Buffer) {
+      buffer = str;
+    } else {
+      buffer = new Buffer(str.toString(), 'binary');
+    }
+    return buffer.toString('base64');
+}
+var qs = require('querystring')
+
+$(window).ready(function() {
+    console.log("Ready!")
+    $('form#registerapp').submit(function(ev) {
+        console.log(window.location)
+        ev.preventDefault();
+        var data = $(this).serialize();
+        console.log("data:", data)
+        var url = window.location.protocol + '//' + window.location.hostname + ':3000/client_register';
+        var success = function(data) {
+            console.log("Sucess data:", data)
+            var keys = Object.keys(data);
+            var os = "";
+            keys.forEach(function(key) {
+                os += "<div><span class='key'>"+key+"</span>" + "<span class='value'>"+ data[key]+"</span></div>"
+            })
+            $('div#output').html(os);
+        }
+        //contentType: "application/json; charset=utf-8",
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success: success,
+            dataType: 'json'
+        });
+        
+    })    
+/*
+    $('#grantpassword').click(function() {
+        // oauth static URL bounce
+        var url = window.location.protocol + '//' + window.location.hostname + ':3000/
+        window.location.replace(url)
+    });
+*/
+/*
+    $('#mybutton').click(function() {
+        var basic = "Basic " + 'thom:nightworld'
+        var b64_basic = btoa(basic)
+        var data = {
+            grant_type:'password',
+            username:'thom',
+            password:'nightworld'
+        }
+        var success = function(data) {
+            console.log("Sucess data:", data)
+        }
+        var url = window.location.protocol + '//' + window.location.hostname + ':3000/oauth/token';
+        console.log(window.location)
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: qs.stringify(data),
+            success: success,
+            dataType: 'json',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader ("Authorization", "Basic "+b64_basic);
+            }
+        });
+    })
+*/
+})
+
+}).call(this,require("buffer").Buffer)
+},{"buffer":1,"querystring":7}]},{},[8]);

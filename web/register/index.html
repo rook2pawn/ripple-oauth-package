@@ -1,0 +1,31 @@
+<html>
+<head>
+    <title>Oauth Ripple Register App</title>
+    <script type='text/javascript' src='js/jquery-2.1.1.min.js'></script>
+    <script type='text/javascript' src='js/bundle.js'></script>
+    <link href='css/index.css' rel='stylesheet' type='text/css' /> 
+</head>
+<body>
+    <div><img src='http://curlpaste.com/ripple.jpg' id='icon'/>Create an application for Ripple</div>
+    <form name='registerapp' id='registerapp'>
+        <div>
+        <span class='key'>Name</span> <input name='name' type='text' value='my sample app'/>
+        </div>
+        <div>
+        <span class='key'>description</span> <textarea name='description' value='my sample desc'></textarea>
+        </div>
+        <div>
+        <span class='key'>redirect URI</span> <input name='redirecturi' value='http://shift.com' type='text'/>
+        </div>
+        <div>
+        <span class='key'>Website logo url</span> <input name='websitelogourl' value='http://shift.com/logo.png' type='text'/>
+        </div>
+        <div>
+        <input type='submit' value='go!'/>
+        </div>
+    </form>
+    <div id='output'>
+    </div>
+</body>
+</html>
+

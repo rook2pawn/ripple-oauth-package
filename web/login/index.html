@@ -1,0 +1,32 @@
+<html>
+<head>
+    <title>Login</title>
+    <script type='text/javascript' src='jquery-2.1.1.min.js'></script>
+</head>
+    <h1>login</h1>
+    <form name='login' id='login'>
+        <span class='key'>username</span><input type='text' name='username' />
+        <span class='key'>password</span><input type='password' name='password' />
+        <input type='submit' value='login'/>
+    </form>
+    <script>
+        $(window).ready(function() {
+            console.log(window.location.search)
+            $('form#login').submit(function(ev) {
+                ev.preventDefault()
+                var data = $('form#login').serialize() 
+                var url = window.location.protocol + '//' + window.location.hostname + ':3000/login';
+                var success = function(resp) {
+                    console.log(resp)
+                }
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: data,
+                    success: success,
+                    dataType: 'json'
+                });
+            })
+        })
+    </script> 
+</html>

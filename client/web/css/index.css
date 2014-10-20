@@ -1,0 +1,17 @@
+img#icon {
+    width:90px;
+    vertical-align:middle;
+}
+form div {
+    margin-top:10px;
+}
+span.key {
+    font-size:18px;
+    font-weight:bold;
+    display:inline-block;
+    width:150px;
+}
+body {
+    font-size:14px;
+    font:normal x-small verdana,arial,helvetica,sans-serif;
+}

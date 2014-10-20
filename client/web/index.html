@@ -3,12 +3,21 @@
     <title>Client to Some 3rd party</title>
     <script type='text/javascript' src='js/jquery-2.1.1.min.js'></script>
     <script type='text/javascript' src='js/bundle.js'></script>
+    <link href='css/index.css' rel='stylesheet' type='text/css' /> 
 </head>
 <body>
-    <div>Welcome to "Insert My 3rd Party App Service" Website!</div>
-    <input id='grantpassword' type='button' value='Get Oauth Grant Type = Password' />
-    <input id='mybutton' type='button' value='Click Me' />
-    <div id='status'></div>
+    <h2>welcome to some 3rd party app</h2>
+    <a id='authlink' href="http://localhost:3000/auth?response_type=code&
+  client_id=CLIENT_ID&redirect_uri=REDIRECT_URI&scope=photos">Sign in with Ripple</a>
+    <div>
+        <span class='key'>client_id</span><input type='text' id='client_id' />
+    </div>
+    <div>
+        <span class='key'>redirect_uri</span><input type='text' id='redirect_uri' />
+    </div>
+    <div>
+        <input type='button' value='modify link' id='modify'/>
+    </div>
 </body>
 </html>
 
