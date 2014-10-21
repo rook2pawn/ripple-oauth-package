@@ -20,7 +20,9 @@ $(window).ready(function() {
         console.log("CLICK!")
         var href = $('a#authlink').attr('href')
         href = href.replace('CLIENT_ID',$('input#client_id').val())
+        href = href.replace('REDIRECT_URI',$('input#redirect_uri').val())
         console.log(href)
+        $('a#authlink').attr('href',href)
     })
 })
 

@@ -1,0 +1,35 @@
+span#thirdparty {
+    font-weight:bold;
+    text-decoration:underline;
+}
+div.box {
+    width:150px;
+    height:150px;
+    line-height:150px;
+    cursor:pointer;
+    text-align:center;
+}
+div.box:hover {
+    font-weight:bold;
+    text-decoration:underline;
+    width:140px;
+    height:140px;
+}
+div#yes:hover {
+    border-width:5px;
+    border-color:green;
+}
+div#yes {
+    border-width:1px;
+    border-color:green;
+    border-style:solid;
+}
+div#no:hover {
+    border-width:5px;
+    border-color:red;
+}
+div#no {
+    border-width:1px;
+    border-color:red;
+    border-style:solid;
+}

@@ -9,15 +9,33 @@
         <span class='key'>password</span><input type='password' name='password' />
         <input type='submit' value='login'/>
     </form>
+    <div id='output'></div>
     <script>
         $(window).ready(function() {
-            console.log(window.location.search)
+
+/*
+var oGetVars = {};
+if (location.search.length > 1) {
+  for (var aItKey, nKeyId = 0, aCouples = location.search.substr(1).split("&"); nKeyId < aCouples.length; nKeyId++) {
+    aItKey = aCouples[nKeyId].split("=");
+    oGetVars[decodeURIComponent(aItKey[0])] = aItKey.length > 1 ? decodeURIComponent(aItKey[1]) : "";
+  }
+}
+*/
             $('form#login').submit(function(ev) {
                 ev.preventDefault()
                 var data = $('form#login').serialize() 
-                var url = window.location.protocol + '//' + window.location.hostname + ':3000/login';
+                var url = window.location.protocol + '//' + window.location.hostname + ':3000/login'+window.location.search;
                 var success = function(resp) {
-                    console.log(resp)
+                    console.log("RESPONSE:",resp)
+                    if (resp.ok) {
+                        $('div#output').html("Login good")
+                        if (resp.redirect) {    
+                            window.location = resp.redirect
+                        }
+                    } else {
+                        $('div#output').html("Login bad")
+                    }
                 }
                 $.ajax({
                     type: "POST",

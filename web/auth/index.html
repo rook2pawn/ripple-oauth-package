@@ -1,0 +1,59 @@
+<html>
+<head>
+    <title>Oauth Server Permissions</title>
+    <link rel='stylesheet' href='css/index.css' />
+    <script type='text/javascript' src='js/jquery-2.1.1.min.js'></script>
+</head>
+<body>
+    <div>Welcome to Ripple Oauth Server</div>
+    <div>
+        A third party application named... 
+        <span id='thirdparty'></span>
+    </div>
+    <div>
+        would like to connect your account
+    </div>
+    <div>
+        with access to x,y,z
+    </div>
+    <div>
+        allow access?
+    </div>
+    <div class='box' id='yes'>
+        Yes
+    </div>
+    <div class='box' id='no'>
+        No
+    </div>
+    <div id='output'></div>
+    <script>
+        $(window).ready(function() {
+            $('div#yes').click(function(ev) {
+                ev.preventDefault()
+                var url = window.location.protocol + '//' + window.location.hostname + ':3000/authorize'+window.location.search;
+                var success = function(resp) {
+                    console.log("RESPONSE:",resp)
+                    if (resp.ok) {
+                        if (resp.redirect) {    
+                            window.location = resp.redirect
+                        }
+                    } else {
+                        $('div#output').html("You aren't logged in ")
+                    }
+                }
+                var data = {allow:'yes'}
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: data,
+                    success: success,
+                    dataType: 'json'
+                });
+            })
+            $('div#no').click(function(ev) {
+            })
+        })
+    </script>
+</body>
+</html>
+
