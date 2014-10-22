@@ -9,9 +9,12 @@ var express = require('express'),
     session = require('express-session'),
     finalhandler = require('finalhandler'),
     hyperstream = require('hyperstream'),
-    crypto = require('crypto')
+    crypto = require('crypto'),
+    hyperglue = require('hyperglue'),
+    permissions = require('./lib/permissions')
 
 var lib = require('./lib')
+var signer = require('./lib/signer')
 
 
 var users = {
@@ -19,6 +22,10 @@ var users = {
 }
 var app = express();
 
+app.use(function(req,res,next) {
+    console.log(req.method,req.url);
+    next()
+})
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(session({secret: 'keyboard cat'}))
@@ -42,9 +49,27 @@ app.post('/client_register',function(req,res,next) {
     response.json(obj).status(200).pipe(res)
 })
 
-app.use(function(req,res,next) {
-    console.log(req.method,req.url);
-    next()
+app.post('/token',function(req,res,next) {
+    console.log("Token request");   
+    console.log(req.body);
+    console.log(clients)
+    var client_id = req.body.client_id;
+    var client_secret = req.body.client_secret;
+    var obj = clients[client_id];
+    if (client_secret === obj.client_secret) {
+        var access_token = uuid.v4()
+        response.json({access_token:access_token}).status(200).pipe(res)
+    } else {
+        response.json({error:'invalid_request'}).status(200).pipe(res)
+    }
+})
+
+
+app.get('/logout',function(req,res,next) {
+    delete req.session.user;
+    var done = finalhandler(req, res)
+    console.log(req.url,req.path)
+    ecstatic('./web')(req,res,done)
 })
 app.get('/auth',function(req,res,next) {
     var client_id, redirect_uri;
@@ -64,12 +89,28 @@ app.get('/auth',function(req,res,next) {
         console.log("ther eis now req session user")
         var client = clients[client_id];
         var done = finalhandler(req, res)
+        var html = [
+            '<div id="rows">',
+            '<div class="row">',
+            '<span class="name"></span>',
+            '<span class="message"></span>',
+            '</div>',
+            '</div>'
+        ].join('\n');
+        var list = permissions.list;
+        list = list.map(function(item) {
+            return { '.name' : item, '.message' : 'Perform operation ' + item }
+        })
+        
         ecstatic('./web',{passthrough:{
             'auth/index.html' : function() { return hyperstream({
                 'span#thirdparty' : {
                     _html: client.name
+                },
+                'div#permissions' : {
+                    _html: hyperglue(html, {'.row': list}).outerHTML
                 }                
-            }) }
+            })}
         }})(req,res,done)
     }
 })
@@ -104,16 +145,18 @@ app.post('/authorize',function(req,res,next) {
         var url = redirect_uri+'?code='+token
         console.log("redirecting to:",url)
         // authorization result object
-        
+        var jwt = lib.generateJwt()
+        console.log("Result of signer signJWT:")
+        console.log(signer.signJWT(jwt.payload))
         var authorization = {
-          "id_token" : id_token_str,
+          "id_token" : "idtokenstr",
           "access_token" : token, 
           "state" : "",
           "expires_in" : "3600",
           "error" : "undefined",
           "error_description" : "undefined",
           "authUser" : "0",
-          "status" : {"
+          "status" : {
             "ripple_logged_in" : "true",
             "method" : "PROMPT",
             "signed_in" : "true"

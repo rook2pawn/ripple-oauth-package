@@ -1,0 +1,54 @@
+<html>
+<head>
+    <title>Client to Some 3rd party:set your client id and secret</title>
+    <script type='text/javascript' src='../js/jquery-2.1.1.min.js'></script>
+    <link href='../css/index.css' rel='stylesheet' type='text/css' /> 
+</head>
+<body>
+    <div class='banner'>
+    <h2>welcome to some 3rd party app</h2>
+    </div>
+    <div class='top'>
+        <div>
+        <span class='key'>Client secret</span><input type='text' id='client_secret' />
+        </div>
+        <div>
+        <span class='key'>Client id</span><input type='text' id='client_id' />
+        </div>
+        <div>
+            <input type='button' value='Set your app info' id='submit'/>
+        </div>
+        <div id='output'>
+        </div>
+    </div>
+    <script>
+    $(window).ready(function() {
+        $('input#submit').click(function() {
+            var url = window.location.protocol + '//' + window.location.hostname + ':'+window.location.port +'/register_app'
+            var client_secret = $('input#client_secret').val()
+            var client_id = $('input#client_id').val()
+            var obj = {
+                client_id:client_id,
+                client_secret:client_secret
+            }
+            var success = function(resp) {
+                console.log("RESPONSE:",resp)
+                if (resp.ok) {
+                    $('div#output').html("App information set<br>" + "<a href='"+resp.href+"'>Sign in with Ripple</a>");
+                } else {
+                    $('div#output').html("App information is NOT set");
+                }
+            }
+            $.ajax({
+                type: "POST",
+                url: url,
+                contentType:"application/json; charset=utf-8",
+                data: JSON.stringify(obj),
+                success: success,
+                dataType: 'json'
+            });
+        })
+    })
+    </script>
+</body>
+</html>

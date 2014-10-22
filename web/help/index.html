@@ -1,0 +1,35 @@
+<html>
+<head>
+    <title>Oauth Server Help</title>
+    <link rel='stylesheet' href='../css/index.css' />
+    <script type='text/javascript' src='../js/jquery-2.1.1.min.js'></script>
+</head>
+<body>
+    <div class='banner'>Help</div>
+    <div class='menu'>
+        <a href="/manage">manage</a>
+        <a href="/login">login</a>
+        <a href="/logout">logout</a>
+        <a href="/register">register 3rd party app</a>
+        <a href="/help">Developer integration documentation</a>
+    </div>
+    <div id='intro'>
+        Help
+        <ol>
+            <li>First register a 3rd party app - your app will receive a client secret
+            <li>You will need to fill a redirect URI value
+            <li>we will supply a widget that will post back the authorization code to your server
+            <li>That server will then submit its client secret along with one of your users authorization code
+            <li>we will give back an access token good for the permissions the user authorized
+            <li>user has capability to revoke access (through /manage) on a granular basis (e.g. funds revocation)
+        </ol>
+            
+    </div>
+    <div id='output'></div>
+    <script>
+        $(window).ready(function() {
+        })
+    </script>
+</body>
+</html>
+

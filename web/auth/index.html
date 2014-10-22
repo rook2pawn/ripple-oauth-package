@@ -1,29 +1,37 @@
 <html>
 <head>
     <title>Oauth Server Permissions</title>
-    <link rel='stylesheet' href='css/index.css' />
-    <script type='text/javascript' src='js/jquery-2.1.1.min.js'></script>
+    <link rel='stylesheet' href='../css/index.css' />
+    <script type='text/javascript' src='../js/jquery-2.1.1.min.js'></script>
 </head>
 <body>
-    <div>Welcome to Ripple Oauth Server</div>
-    <div>
-        A third party application named... 
-        <span id='thirdparty'></span>
+    <div class='banner'>Welcome to Ripple Oauth Server</div>
+    <div class='menu'>
+        <a href="/manage">manage</a>
+        <a href="/login">login</a>
+        <a href="/logout">logout</a>
+        <a href="/register">register 3rd party app</a>
+        <a href="/help">Developer integration documentation</a>
     </div>
-    <div>
+    <div id='intro'>
+        A third party application, <span id='thirdparty'></span>
         would like to connect your account
     </div>
-    <div>
+    <div id='permissions'>
         with access to x,y,z
     </div>
-    <div>
-        allow access?
-    </div>
-    <div class='box' id='yes'>
-        Yes
-    </div>
-    <div class='box' id='no'>
-        No
+    <div id='allowaccess'>
+        <div style='margin:0 auto;width:350px;'>
+        Allow access?
+        <div class='clear'></div>
+        <div class='box' id='yes'>
+            Yes
+        </div>
+        <div class='box' id='no'>
+            No
+        </div>
+        </div>
+        <div class='clear'></div>
     </div>
     <div id='output'></div>
     <script>
@@ -32,7 +40,6 @@
                 ev.preventDefault()
                 var url = window.location.protocol + '//' + window.location.hostname + ':3000/authorize'+window.location.search;
                 var success = function(resp) {
-                    console.log("RESPONSE:",resp)
                     if (resp.ok) {
                         if (resp.redirect) {    
                             window.location = resp.redirect

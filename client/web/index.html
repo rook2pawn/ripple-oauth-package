@@ -5,13 +5,17 @@
     <link href='css/index.css' rel='stylesheet' type='text/css' /> 
 </head>
 <body>
+    <div class='banner'>
     <h2>welcome to some 3rd party app</h2>
-    <a id='authlink' href="http://localhost:3000/auth?response_type=code&client_id=CLIENT_ID&redirect_uri=REDIRECT_URI&scope=photos">Sign in with Ripple</a>
-    <div>
-        <span class='key'>client_id</span><input type='text' id='client_id' />
     </div>
-    <div>
-        <input type='button' value='modify link' id='modify'/>
+    <div class='top'>
+        <a id='authlink' href="http://localhost:3000/auth?response_type=code&client_id=CLIENT_ID">Sign in with Ripple</a>
+        <div>
+            <span class='key'>client_id</span><input type='text' id='client_id' />
+        </div>
+        <div>
+            <input type='button' value='modify link' id='modify'/>
+        </div>
     </div>
     <script>
     $(window).ready(function() {

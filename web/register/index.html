@@ -1,31 +1,70 @@
 <html>
 <head>
     <title>Oauth Ripple Register App</title>
-    <script type='text/javascript' src='js/jquery-2.1.1.min.js'></script>
-    <script type='text/javascript' src='js/bundle.js'></script>
-    <link href='css/index.css' rel='stylesheet' type='text/css' /> 
+    <script type='text/javascript' src='../js/jquery-2.1.1.min.js'></script>
+    <link href='../css/index.css' rel='stylesheet' type='text/css' /> 
 </head>
 <body>
-    <div><img src='http://curlpaste.com/ripple.jpg' id='icon'/>Create an application for Ripple</div>
-    <form name='registerapp' id='registerapp'>
-        <div>
-        <span class='key'>Name</span> <input name='name' type='text' value='Very Modern Wallet'/>
-        </div>
-        <div>
-        <span class='key'>description</span> <textarea name='description'>The Most Feature Rich Wallet Ever</textarea>
-        </div>
-        <div>
-        <span class='key'>redirect URI</span> <input name='redirect_uri' value='http://shift.com' type='text'/>
-        </div>
-        <div>
-        <span class='key'>Website logo url</span> <input name='websitelogourl' value='http://shift.com/logo.png' type='text'/>
-        </div>
-        <div>
-        <input type='submit' value='go!'/>
-        </div>
-    </form>
-    <div id='output'>
+    <div class='banner'>
+        Register 3rd party application into Ripple
     </div>
+    <div class='menu'>
+        <a href="/manage">manage</a>
+        <a href="/login">login</a>
+        <a href="/logout">logout</a>
+        <a href="/register">register 3rd party app</a>
+        <a href="/help">Developer integration documentation</a>
+    </div>
+    <div class='bottom'>
+        <img src='http://curlpaste.com/ripple.jpg' id='icon'/>Create an application for Ripple
+        <form name='registerapp' id='registerapp'>
+            <div>
+            <span class='key'>Name</span> <input name='name' type='text' value='Very Modern Wallet'/>
+            </div>
+            <div>
+            <span class='key'>description</span> <textarea name='description'>The Most Feature Rich Wallet Ever</textarea>
+            </div>
+            <div>
+            <span class='key'>redirect URI</span> <input name='redirect_uri' value='http://localhost:3005/response' type='text'/>
+            </div>
+            <div>
+            <span class='key'>Website logo url</span> <input name='websitelogourl' value='http://localhost:3005/aperture_science.png' type='text'/>
+            </div>
+            <div>
+            <input type='submit' value='go!'/>
+            </div>
+        </form>
+        <div id='output'>
+        </div>
+    </div>
+    <script>
+        $(window).ready(function() {
+            console.log("Ready!")
+            $('form#registerapp').submit(function(ev) {
+                console.log(window.location)
+                ev.preventDefault();
+                var data = $(this).serialize();
+                console.log("data:", data)
+                var url = window.location.protocol + '//' + window.location.hostname + ':3000/client_register';
+                var success = function(data) {
+                    console.log("Sucess data:", data)
+                    var keys = Object.keys(data);
+                    var os = "";
+                    keys.forEach(function(key) {
+                        os += "<div><span class='key'>"+key+"</span>" + "<span class='value'>"+ data[key]+"</span></div>"
+                    })
+                    $('div#output').html(os);
+                }
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: data,
+                    success: success,
+                    dataType: 'json'
+                });
+            })    
+        })
+    </script>
 </body>
 </html>
 

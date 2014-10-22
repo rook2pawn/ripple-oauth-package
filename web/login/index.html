@@ -1,15 +1,28 @@
 <html>
 <head>
     <title>Login</title>
-    <script type='text/javascript' src='jquery-2.1.1.min.js'></script>
+    <script type='text/javascript' src='../js/jquery-2.1.1.min.js'></script>
+    <link rel='stylesheet' href='../css/index.css' />
 </head>
+<body>
+    <div class='banner'>
     <h1>login</h1>
+    </div>
+    <div class='menu'>
+        <a href="/manage">manage</a>
+        <a href="/login">login</a>
+        <a href="/logout">logout</a>
+        <a href="/register">register 3rd party app</a>
+        <a href="/help">Developer integration documentation</a>
+    </div>
+    <div class='bottom'>
     <form name='login' id='login'>
         <span class='key'>username</span><input type='text' name='username' />
         <span class='key'>password</span><input type='password' name='password' />
         <input type='submit' value='login'/>
     </form>
     <div id='output'></div>
+    </div>
     <script>
         $(window).ready(function() {
 
@@ -47,4 +60,5 @@ if (location.search.length > 1) {
             })
         })
     </script> 
+</body>
 </html>

@@ -14,14 +14,16 @@
     "browserify": "^6.1.0",
     "ecstatic": "https://github.com/rook2pawn/node-ecstatic/archive/stream_passthrough.tar.gz",
     "express": "^4.9.7",
+    "express-session": "^1.9.0",
+    "finalhandler": "^0.3.1",
+    "hyperglue": "^1.3.3",
+    "hyperstream": "^1.2.1",
     "knex": "^0.7.3",
     "oauth2-server": "^2.3.0",
     "pg": "^3.6.0",
+    "request": "^2.45.0",
     "response": "https://github.com/mikeal/response/archive/master.tar.gz",
-    "uuid": "^2.0.1",
-    "express-session": "^1.9.0",
     "serve-static": "^1.7.0",
-    "finalhandler": "^0.3.1",
-    "hyperstream": "^1.2.1"
+    "uuid": "^2.0.1"
   }
 }
