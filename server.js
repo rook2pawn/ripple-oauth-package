@@ -64,6 +64,21 @@ app.post('/token',function(req,res,next) {
     }
 })
 
+app.get('/manage',function(req,res,next) {
+    // if user is not logged in / did not present correct
+    // signature, have them re-auth
+    
+    // look up user, get list of client ids
+    // for that user, for each client app, they have a list
+    // of true or false agreed upon permissions
+    // render out form with checkboxes on yes or no
+    // allow them to modify permissions freely and repost
+    // 
+/*
+    var done = finalhandler(req, res)
+    ecstatic('./web')(req,res,done)
+*/
+})
 
 app.get('/logout',function(req,res,next) {
     delete req.session.user;
