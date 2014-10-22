@@ -18,7 +18,7 @@ var signer = require('./lib/signer')
 
 
 var users = {
-    'foo' : 'bar'
+    'foo' : {password:'bar'}
 }
 var app = express();
 
@@ -40,9 +40,51 @@ app.oauth = oauthserver({
 
 */
 var clients = {};
-app.post('/client_register',function(req,res,next) {
-    console.log(req.body);
+
+app.get('/permissions', function(req,res,next) {
+    var os = "";
+    permissions.list.forEach(function(item) {
+        os += "<div><span>Permission:" + item + "</span></div>";
+    })
+    var done = finalhandler(req, res)
+    ecstatic('./web',{passthrough:{
+    'permissions/index.html' : function() { return hyperstream({
+            'div#permissions' : {
+                _html: os
+            }                
+        })}
+    }})(req,res,done)
+})
+
+/*
+app.get('/register',function(req,res,next) {
+    var os = "";
+    permissions.list.forEach(function(item) {
+        os += "<div><input type='checkbox' name='"+item+"' /> <span>Permission to perform " + item + "</span></div>";
+    })
+    var done = finalhandler(req, res)
+    ecstatic('./web',{passthrough:{
+    'register/index.html' : function() { return hyperstream({
+            'div#permissions' : {
+                _html: os
+            }                
+        })}
+    }})(req,res,done)
+})
+*/
+
+app.post('/register',function(req,res,next) {
     var obj = req.body;
+/*
+    var chosen_perms = {};
+    Object.keys(obj).forEach(function(key) {
+        if (permissions.list.indexOf(key) !== -1) {
+            chosen_perms[key] = obj[key];
+            delete obj[key];
+        }
+    })
+    obj.permissions = chosen_perms;
+*/
     obj.client_secret = uuid.v4();
     obj.client_id = uuid.v4();
     clients[obj.client_id] = obj;
@@ -65,6 +107,7 @@ app.post('/token',function(req,res,next) {
 })
 
 app.get('/manage',function(req,res,next) {
+    console.log("Manage")
     // if user is not logged in / did not present correct
     // signature, have them re-auth
     
@@ -74,10 +117,32 @@ app.get('/manage',function(req,res,next) {
     // render out form with checkboxes on yes or no
     // allow them to modify permissions freely and repost
     // 
-/*
     var done = finalhandler(req, res)
-    ecstatic('./web')(req,res,done)
-*/
+    if (req.session.user) {
+        var apps = Object.keys(users[req.session.user].apps)
+        var os = "";
+        apps.forEach(function(client_id) {
+            var perms = users[req.session.user].apps[client_id].permissions
+            var name = clients[client_id].name
+            os += "<div class='app'><img src='"+clients[client_id].websitelogourl+"' height='40' width='40'><span class='appname'>"+name+"</span>"
+            var keys = Object.keys(perms)
+            keys.forEach(function(key) {
+                os += "<div class='permissions'><input type='checkbox' checked name='"+key+"'/><span class='permissionname'>" + key + "</span></div>"
+            })
+            os += "</div>"
+        })
+        console.log(os)
+        ecstatic('./web',{passthrough:{
+            'manage/index.html' : function() { return hyperstream({
+                'div#apps' : {
+                    _html: os
+                }                
+            })}
+        }})(req,res,done)
+    } else {
+        console.log("? not logged in");
+        ecstatic('./web')(req,res,done)
+    }
 })
 
 app.get('/logout',function(req,res,next) {
@@ -112,11 +177,10 @@ app.get('/auth',function(req,res,next) {
             '</div>',
             '</div>'
         ].join('\n');
-        var list = permissions.list;
+        var list = Object.keys(client.permissions)
         list = list.map(function(item) {
             return { '.name' : item, '.message' : 'Perform operation ' + item }
         })
-        
         ecstatic('./web',{passthrough:{
             'auth/index.html' : function() { return hyperstream({
                 'span#thirdparty' : {
@@ -132,16 +196,16 @@ app.get('/auth',function(req,res,next) {
 
 
     var generateRandomToken = function (callback) {
-      crypto.randomBytes(256, function (ex, buffer) {
-        if (ex) return callback(error('server_error'));
+    crypto.randomBytes(256, function (ex, buffer) {
+    if (ex) return callback(error('server_error'));
 
-        var token = crypto
-          .createHash('sha1')
-          .update(buffer)
-          .digest('hex');
+    var token = crypto
+    .createHash('sha1')
+    .update(buffer)
+    .digest('hex');
 
-        callback(false, token);
-      });
+    callback(false, token);
+    });
     };
 
 app.post('/authorize',function(req,res,next) {
@@ -155,6 +219,13 @@ app.post('/authorize',function(req,res,next) {
     var client_id = req.query.client_id;
     var redirect_uri = clients[client_id].redirect_uri;
     console.log(clients)
+    // user takes the initial set of permissions
+    var perms = clients[client_id].permissions
+    if (users[req.session.user].apps === undefined) {
+        users[req.session.user].apps = {}
+    }
+    users[req.session.user].apps[client_id] = {permissions:perms}
+    console.log(users)
     generateRandomToken(function(err,token) {
         console.log("Generated Token:", token)
         var url = redirect_uri+'?code='+token
@@ -189,17 +260,12 @@ app.use(function(req,res,next) {
 
 // Handle login
 app.post('/login', function (req, res, next) {
-    console.log("Login",req.body)
-    console.log(req.query)
     var obj = req.body;
     var args = qs.stringify({client_id:req.query.client_id})
-    console.log(args)
-    if ((users[obj.username]) && (users[obj.username] == obj.password)) {
-        console.log("Good")
+    if ((users[obj.username]) && (users[obj.username].password == obj.password)) {
         req.session.user = obj.username;
         response.json({ok:true,redirect:'/auth?'+args}).status(200).pipe(res)
     } else {
-        console.log("bad")
         response.json({ok:false}).status(200).pipe(res)
     }
 });

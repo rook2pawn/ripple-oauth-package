@@ -23,6 +23,18 @@
     </div>
     <script>
     $(window).ready(function() {
+        var oGetVars = {};
+        console.log(window.location.search)
+        if (window.location.search.length > 1) {
+            for (var aItKey, nKeyId = 0, aCouples = window.location.search.substr(1).split("&"); nKeyId < aCouples.length; nKeyId++) {
+                aItKey = aCouples[nKeyId].split("=");
+                oGetVars[decodeURIComponent(aItKey[0])] = aItKey.length > 1 ? decodeURIComponent(aItKey[1]) : "";
+            }
+        }
+        if ((oGetVars.client_id) && (oGetVars.client_secret)) {
+            $('input#client_secret').val(oGetVars.client_secret)
+            $('input#client_id').val(oGetVars.client_id)
+        }
         $('input#submit').click(function() {
             var url = window.location.protocol + '//' + window.location.hostname + ':'+window.location.port +'/register_app'
             var client_secret = $('input#client_secret').val()
@@ -34,7 +46,7 @@
             var success = function(resp) {
                 console.log("RESPONSE:",resp)
                 if (resp.ok) {
-                    $('div#output').html("App information set<br>" + "<a href='"+resp.href+"'>Sign in with Ripple</a>");
+                    $('div#output').html("App information set<br>" + "<a target='_blank' href='"+resp.href+"'>Sign in with Ripple</a>");
                 } else {
                     $('div#output').html("App information is NOT set");
                 }

@@ -37,7 +37,7 @@ div#no {
 div.banner {
     background-color:#E1E1E1;
     background-image:url(../logo.png);
-    background-position:5% 50%;
+    background-position:40px 50%;
     background-repeat:no-repeat;
     padding:40px;
     padding-left:320px;
@@ -88,6 +88,7 @@ span.key {
 div.menu {
     background-color:#59588F;
     padding:20px;
+    padding-left:150px;
 }
 div.menu a {
     padding-left:20px;
@@ -99,4 +100,19 @@ div.menu a {
 }
 div.menu a:hover {
     text-decoration:underline;
+}
+
+div#apps {
+    margin:0 auto;
+    width:60%;
+}
+div.app {
+    margin-top:10px;
+    margin-bottom:10px;
+    padding-bottom:10px;
+    border-bottom:1px solid #ebebeb;
+}
+div.app img {
+    vertical-align:middle;
+    margin-right:15px;
 }
