@@ -11,6 +11,9 @@ var express = require('express'),
     hyperstream = require('hyperstream'),
     crypto = require('crypto')
 
+var lib = require('./lib')
+
+
 var users = {
     'foo' : 'bar'
 }
@@ -100,7 +103,23 @@ app.post('/authorize',function(req,res,next) {
         console.log("Generated Token:", token)
         var url = redirect_uri+'?code='+token
         console.log("redirecting to:",url)
-        response.json({ok:true,redirect:url}).status(200).pipe(res)
+        // authorization result object
+        
+        var authorization = {
+          "id_token" : id_token_str,
+          "access_token" : token, 
+          "state" : "",
+          "expires_in" : "3600",
+          "error" : "undefined",
+          "error_description" : "undefined",
+          "authUser" : "0",
+          "status" : {"
+            "ripple_logged_in" : "true",
+            "method" : "PROMPT",
+            "signed_in" : "true"
+          }
+        };
+        response.json({ok:true,authorization:authorization,redirect:url}).status(200).pipe(res)
 //        res.redirect(url)
     })
 })

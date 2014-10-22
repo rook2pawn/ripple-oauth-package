@@ -2,7 +2,6 @@
 <head>
     <title>Client to Some 3rd party</title>
     <script type='text/javascript' src='js/jquery-2.1.1.min.js'></script>
-    <script type='text/javascript' src='js/bundle.js'></script>
     <link href='css/index.css' rel='stylesheet' type='text/css' /> 
 </head>
 <body>
@@ -12,11 +11,16 @@
         <span class='key'>client_id</span><input type='text' id='client_id' />
     </div>
     <div>
-        <span class='key'>redirect_uri</span><input type='text' id='redirect_uri' />
-    </div>
-    <div>
         <input type='button' value='modify link' id='modify'/>
     </div>
+    <script>
+    $(window).ready(function() {
+        $('input#modify').click(function() {
+            var href = $('a#authlink').attr('href')
+            href = href.replace('CLIENT_ID',$('input#client_id').val())
+            $('a#authlink').attr('href',href)
+        })
+    })
+    </script>
 </body>
 </html>
-
