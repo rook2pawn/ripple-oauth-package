@@ -11,7 +11,12 @@ var express = require('express'),
     hyperstream = require('hyperstream'),
     crypto = require('crypto'),
     hyperglue = require('hyperglue'),
-    permissions = require('./lib/permissions')
+    permissions = require('./lib/permissions'),
+    util = require('util')
+
+var inspect = function(msg) {
+    console.log(util.inspect(msg, { showHidden: true, depth: null }));
+}
 
 var lib = require('./lib')
 var signer = require('./lib/signer')
@@ -20,6 +25,9 @@ var signer = require('./lib/signer')
 var users = {
     'foo' : {password:'bar'}
 }
+var clients = {};
+var tokens = {}
+
 var app = express();
 
 app.use(function(req,res,next) {
@@ -39,7 +47,6 @@ app.oauth = oauthserver({
 });
 
 */
-var clients = {};
 
 app.get('/permissions', function(req,res,next) {
     var os = "";
@@ -56,35 +63,9 @@ app.get('/permissions', function(req,res,next) {
     }})(req,res,done)
 })
 
-/*
-app.get('/register',function(req,res,next) {
-    var os = "";
-    permissions.list.forEach(function(item) {
-        os += "<div><input type='checkbox' name='"+item+"' /> <span>Permission to perform " + item + "</span></div>";
-    })
-    var done = finalhandler(req, res)
-    ecstatic('./web',{passthrough:{
-    'register/index.html' : function() { return hyperstream({
-            'div#permissions' : {
-                _html: os
-            }                
-        })}
-    }})(req,res,done)
-})
-*/
 
 app.post('/register',function(req,res,next) {
     var obj = req.body;
-/*
-    var chosen_perms = {};
-    Object.keys(obj).forEach(function(key) {
-        if (permissions.list.indexOf(key) !== -1) {
-            chosen_perms[key] = obj[key];
-            delete obj[key];
-        }
-    })
-    obj.permissions = chosen_perms;
-*/
     obj.client_secret = uuid.v4();
     obj.client_id = uuid.v4();
     clients[obj.client_id] = obj;
@@ -99,8 +80,17 @@ app.post('/token',function(req,res,next) {
     var client_secret = req.body.client_secret;
     var obj = clients[client_id];
     if (client_secret === obj.client_secret) {
-        var access_token = uuid.v4()
-        response.json({access_token:access_token}).status(200).pipe(res)
+        var access_token = uuid.v4();
+        var access_token_obj = { 
+            access_token:access_token,
+            token_type: 'bearer',
+            expires_in:3600,
+            refresh_token:uuid.v4()
+        };
+        tokens[access_token] = access_token_obj;
+        tokens[access_token].client_id = client_id;
+        tokens[access_token].issue_time = new Date().getTime()
+        response.json(access_token_obj).status(200).pipe(res)
     } else {
         response.json({error:'invalid_request'}).status(200).pipe(res)
     }
@@ -158,39 +148,96 @@ app.get('/auth',function(req,res,next) {
     }
     if (req.query) {
         client_id = req.query.client_id;
+        console.log("CLIENT ID ON /auth:", client_id,clients)
         if ((!client_id) || (!clients[client_id])) {
-            return response.txt('invalid client id').status(400).pipe(res) 
+            return response.json({error:'invalid request'}).status(400).pipe(res) 
         }
-    } 
+        if (req.query.redirect_uri != clients[client_id].redirect_uri) {
+            return response.json({error:'invalid request'}).status(400).pipe(res) 
+        }
+    }
     if (!req.session.user) {
         console.log("no req session user")
-        res.redirect('/login?client_id='+client_id)
+        res.redirect('/login?'+qs.stringify(req.query))
     } else {
-        console.log("ther eis now req session user")
+        console.log("there is now req session user")
         var client = clients[client_id];
-        var done = finalhandler(req, res)
-        var html = [
-            '<div id="rows">',
-            '<div class="row">',
-            '<span class="name"></span>',
-            '<span class="message"></span>',
-            '</div>',
-            '</div>'
-        ].join('\n');
-        var list = Object.keys(client.permissions)
-        list = list.map(function(item) {
-            return { '.name' : item, '.message' : 'Perform operation ' + item }
+        var list = req.query.scope.split(' ')
+        var perms = list.filter(function(item) {
+            return (permissions.list.indexOf(item) !== -1)
         })
-        ecstatic('./web',{passthrough:{
-            'auth/index.html' : function() { return hyperstream({
-                'span#thirdparty' : {
-                    _html: client.name
-                },
-                'div#permissions' : {
-                    _html: hyperglue(html, {'.row': list}).outerHTML
-                }                
-            })}
-        }})(req,res,done)
+        var obj = users[req.session.user]
+        console.log("Requested Perms:", perms)
+        inspect(obj);
+        console.log("CLIENT ID:", client_id)
+        // isValid == true -> flow through auth, no yes/no asking, redirect
+        // isValid == false --> yes/no asking
+        var isValid = true;
+        if (obj && obj.apps && obj.apps[client_id] && obj.apps[client_id].permissions) {
+            perms.forEach(function(p) {
+                if (obj.apps[client_id].permissions.indexOf(p) === -1) {
+                    console.log("NO PERMISSION!!!",obj.apps[client_id].permissions,p)
+                    isValid = false; 
+                }
+            })
+            // check expiries
+            // assume expiry good
+        }  else {
+            console.log("PERMISSIONS SETTINGS")
+            isValid = false;
+        }
+        if (!isValid) {
+            var done = finalhandler(req, res)
+            var html = [
+                '<div id="rows">',
+                '<div class="row">',
+                '<span class="name"></span>',
+                '<span class="message"></span>',
+                '</div>',
+                '</div>'
+            ].join('\n');
+            list = perms.map(function(item) {
+                return { '.name' : item, '.message' : 'Perform operation ' + item }
+            })
+            ecstatic('./web',{passthrough:{
+                'auth/index.html' : function() { return hyperstream({
+                    'span#thirdparty' : {
+                        _html: client.name
+                    },
+                    'div#permissions' : {
+                        _html: hyperglue(html, {'.row': list}).outerHTML
+                    }                
+                })}
+            }})(req,res,done)
+        } else {
+            console.log("Flow through");
+            // flow through   
+            var redirect_uri = client.redirect_uri;
+            generateRandomToken(function(err,token) {
+                console.log("Generated Token:", token)
+                var url = redirect_uri+'?code='+token
+                console.log("redirecting to:",url)
+                // authorization result object
+                var jwt = lib.generateJwt()
+                var idtokenstr = signer.signJWT(jwt.payload)
+                var authorization = {
+                  "id_token" : idtokenstr,
+                  "access_token" : token, 
+                  "state" : "",
+                  "expires_in" : "3600",
+                  "error" : "undefined",
+                  "error_description" : "undefined",
+                  "authUser" : "0",
+                  "status" : {
+                    "ripple_logged_in" : "true",
+                    "method" : "PROMPT",
+                    "signed_in" : "true"
+                  }
+                };
+                url = url + "&"+ qs.stringify(authorization)
+                res.redirect(url)
+            })
+        }
     }
 })
 
@@ -208,34 +255,37 @@ app.get('/auth',function(req,res,next) {
     });
     };
 
-app.post('/authorize',function(req,res,next) {
-    console.log("req.query authorize:", req.query)
+app.post('/auth',function(req,res,next) {
+    console.log("POST req.query auth:", req.query)
     if (!req.session.user) {
-        return res.redirect('/login?client_id=' + req.query.client_id +
-        '&redirect_uri=' + req.query.redirect_uri);
+        var args = qs.stringify(req.query)
+        return res.redirect('/login?'+args)
     }
     next();
 }, function(req, res, next) {
     var client_id = req.query.client_id;
     var redirect_uri = clients[client_id].redirect_uri;
-    console.log(clients)
-    // user takes the initial set of permissions
-    var perms = clients[client_id].permissions
+
+    var list = req.query.scope.split(' ')
+    var perms = list.filter(function(item) {
+        return (permissions.list.indexOf(item) !== -1)
+    })
     if (users[req.session.user].apps === undefined) {
         users[req.session.user].apps = {}
     }
-    users[req.session.user].apps[client_id] = {permissions:perms}
-    console.log(users)
+    if (req.body.allow == 'yes') {
+        users[req.session.user].apps[client_id] = {permissions:perms};
+        console.log("User gave authorization:, users", users);
+    }
     generateRandomToken(function(err,token) {
         console.log("Generated Token:", token)
         var url = redirect_uri+'?code='+token
         console.log("redirecting to:",url)
         // authorization result object
         var jwt = lib.generateJwt()
-        console.log("Result of signer signJWT:")
-        console.log(signer.signJWT(jwt.payload))
+        var idtokenstr = signer.signJWT(jwt.payload)
         var authorization = {
-          "id_token" : "idtokenstr",
+          "id_token" : idtokenstr,
           "access_token" : token, 
           "state" : "",
           "expires_in" : "3600",
@@ -248,6 +298,7 @@ app.post('/authorize',function(req,res,next) {
             "signed_in" : "true"
           }
         };
+        url = url + "&"+ qs.stringify(authorization)
         response.json({ok:true,authorization:authorization,redirect:url}).status(200).pipe(res)
 //        res.redirect(url)
     })
@@ -261,9 +312,10 @@ app.use(function(req,res,next) {
 // Handle login
 app.post('/login', function (req, res, next) {
     var obj = req.body;
-    var args = qs.stringify({client_id:req.query.client_id})
+    var args = qs.stringify(req.query)
     if ((users[obj.username]) && (users[obj.username].password == obj.password)) {
         req.session.user = obj.username;
+        console.log("Redirecting user to /auth after /login")
         response.json({ok:true,redirect:'/auth?'+args}).status(200).pipe(res)
     } else {
         response.json({ok:false}).status(200).pipe(res)

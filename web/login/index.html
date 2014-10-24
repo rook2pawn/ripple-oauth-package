@@ -26,16 +26,6 @@
     </div>
     <script>
         $(window).ready(function() {
-
-/*
-var oGetVars = {};
-if (location.search.length > 1) {
-  for (var aItKey, nKeyId = 0, aCouples = location.search.substr(1).split("&"); nKeyId < aCouples.length; nKeyId++) {
-    aItKey = aCouples[nKeyId].split("=");
-    oGetVars[decodeURIComponent(aItKey[0])] = aItKey.length > 1 ? decodeURIComponent(aItKey[1]) : "";
-  }
-}
-*/
             $('form#login').submit(function(ev) {
                 ev.preventDefault()
                 var data = $('form#login').serialize() 

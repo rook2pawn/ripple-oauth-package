@@ -39,8 +39,9 @@
         $(window).ready(function() {
             $('div#yes').click(function(ev) {
                 ev.preventDefault()
-                var url = window.location.protocol + '//' + window.location.hostname + ':3000/authorize'+window.location.search;
+                var url = window.location.protocol + '//' + window.location.hostname + ':3000/auth'+window.location.search;
                 var success = function(resp) {
+                    console.log(resp);
                     if (resp.ok) {
                         if (resp.redirect) {    
                             window.location = resp.redirect

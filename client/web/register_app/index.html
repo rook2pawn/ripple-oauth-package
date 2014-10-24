@@ -16,6 +16,9 @@
         <span class='key'>Client id</span><input type='text' id='client_id' />
         </div>
         <div>
+        <span class='key'>Redirect URI</span><input type='text' id='redirect_uri'/>
+        </div>
+        <div>
             <input type='button' value='Set your app info' id='submit'/>
         </div>
         <div id='output'>
@@ -34,19 +37,24 @@
         if ((oGetVars.client_id) && (oGetVars.client_secret)) {
             $('input#client_secret').val(oGetVars.client_secret)
             $('input#client_id').val(oGetVars.client_id)
+            $('input#redirect_uri').val(oGetVars.redirect_uri)
         }
         $('input#submit').click(function() {
             var url = window.location.protocol + '//' + window.location.hostname + ':'+window.location.port +'/register_app'
             var client_secret = $('input#client_secret').val()
             var client_id = $('input#client_id').val()
+            var redirect_uri = $('input#redirect_uri').val()
             var obj = {
                 client_id:client_id,
-                client_secret:client_secret
+                client_secret:client_secret,
+                redirect_uri:redirect_uri
             }
             var success = function(resp) {
                 console.log("RESPONSE:",resp)
                 if (resp.ok) {
-                    $('div#output').html("App information set<br>" + "<a target='_blank' href='"+resp.href+"'>Sign in with Ripple</a>");
+                    // add some scope 
+                    var href = "http://localhost:3000/auth?response_type=code&client_id="+encodeURIComponent(obj.client_id)+"&redirect_uri="+encodeURIComponent(obj.redirect_uri)+"&scope=a+b"
+                    $('div#output').html("App information set<br>" + "<a target='_blank' href='"+href+"'>Sign in with Ripple with scope a+b</a>");
                 } else {
                     $('div#output').html("App information is NOT set");
                 }

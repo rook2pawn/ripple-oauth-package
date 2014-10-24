@@ -46,7 +46,7 @@
                 ev.preventDefault();
                 var data = $(this).serialize();
                 console.log("data:", data)
-                var url = window.location.protocol + '//' + window.location.hostname + ':3000/client_register';
+                var url = window.location.protocol + '//' + window.location.hostname + ':3000/register';
                 var success = function(data) {
                     console.log("Sucess data:", data)
                     var keys = Object.keys(data);
@@ -54,7 +54,7 @@
                     keys.forEach(function(key) {
                         os += "<div><span class='key'>"+key+"</span>" + "<span class='value'>"+ data[key]+"</span></div>"
                     })
-                    os += "<br><a href='http://localhost:3000/register_app?client_id="+data.client_id+"&client_secret="+data.client_secret+"'>Convenience App Link</a>";
+                    os += "<br><a href='http://localhost:3005/register_app?redirect_uri="+data.redirect_uri+"&client_id="+data.client_id+"&client_secret="+data.client_secret+"'>Convenience App Link</a>";
                     $('div#output').html(os);
                 }
                 $.ajax({

@@ -22,6 +22,7 @@
                 oGetVars[decodeURIComponent(aItKey[0])] = aItKey.length > 1 ? decodeURIComponent(aItKey[1]) : "";
             }
         }
+        console.log(oGetVars)
         $('#request_token').click(function() {
             var url = window.location.protocol + '//' + window.location.hostname + ':'+window.location.port +'/request_token'
             var success = function(resp) {
